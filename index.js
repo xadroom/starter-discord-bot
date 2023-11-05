@@ -1,113 +1,63 @@
-
-// const { clientId, guildId, token, publicKey } = require('./config.json');
-require('dotenv').config()
-const APPLICATION_ID = process.env.APPLICATION_ID 
-const TOKEN = process.env.TOKEN 
-const PUBLIC_KEY = process.env.PUBLIC_KEY || 'not set'
-const GUILD_ID = process.env.GUILD_ID 
-
-
-const axios = require('axios')
-const express = require('express');
-const { InteractionType, InteractionResponseType, verifyKeyMiddleware } = require('discord-interactions');
-
-
-const app = express();
-// app.use(bodyParser.json());
-
-const discord_api = axios.create({
-  baseURL: 'https://discord.com/api/',
-  timeout: 3000,
-  headers: {
-	"Access-Control-Allow-Origin": "*",
-	"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-	"Access-Control-Allow-Headers": "Authorization",
-	"Authorization": `Bot ${TOKEN}`
-  }
-});
-
-
-
-
-app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
-  const interaction = req.body;
-
-  if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-    console.log(interaction.data.name)
-    if(interaction.data.name == 'yo'){
-      return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: `Yo ${interaction.member.user.username}!`,
-        },
-      });
-    }
-
-    if(interaction.data.name == 'dm'){
-      // https://discord.com/developers/docs/resources/user#create-dm
-      let c = (await discord_api.post(`/users/@me/channels`,{
-        recipient_id: interaction.member.user.id
-      })).data
-      try{
-        // https://discord.com/developers/docs/resources/channel#create-message
-        let res = await discord_api.post(`/channels/${c.id}/messages`,{
-          content:'Yo! I got your slash command. I am not able to respond to DMs just slash commands.',
-        })
-        console.log(res.data)
-      }catch(e){
-        console.log(e)
-      }
-
-      return res.send({
-        // https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data:{
-          content:'👍'
-        }
-      });
-    }
-  }
-
-});
-
-
-
-app.get('/register_commands', async (req,res) =>{
-  let slash_commands = [
-    {
-      "name": "yo",
-      "description": "replies with Yo!",
-      "options": []
+const Discord = require("discord.js");
+const config = require(`./botconfig/config.json`);
+const settings = require(`./botconfig/settings.json`);
+const colors = require("colors");
+const client = new Discord.Client({
+    //fetchAllMembers: false,
+    //restTimeOffset: 0,
+    //restWsBridgetimeout: 100,
+    shards: "auto",
+    allowedMentions: {
+      parse: [ ],
+      repliedUser: false,
     },
-    {
-      "name": "dm",
-      "description": "sends user a DM",
-      "options": []
+    partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+    intents: [ 
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_MEMBERS,
+        //Discord.Intents.FLAGS.GUILD_BANS,
+        //Discord.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+        //Discord.Intents.FLAGS.GUILD_INTEGRATIONS,
+        //Discord.Intents.FLAGS.GUILD_WEBHOOKS,
+        //Discord.Intents.FLAGS.GUILD_INVITES,
+        Discord.Intents.FLAGS.GUILD_VOICE_STATES,
+        //Discord.Intents.FLAGS.GUILD_PRESENCES,
+        Discord.Intents.FLAGS.GUILD_MESSAGES,
+        Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        //Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING,
+        //Discord.Intents.FLAGS.DIRECT_MESSAGES,
+        //Discord.Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
+        //Discord.Intents.FLAGS.DIRECT_MESSAGE_TYPING
+    ],
+    presence: {
+      activity: {
+        name: `Bot oficial del gobierno`, 
+        type: "PLAYING", 
+      },
+      status: "online"
     }
-  ]
-  try
-  {
-    // api docs - https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
-    let discord_response = await discord_api.put(
-      `/applications/${APPLICATION_ID}/guilds/${GUILD_ID}/commands`,
-      slash_commands
-    )
-    console.log(discord_response.data)
-    return res.send('commands have been registered')
-  }catch(e){
-    console.error(e.code)
-    console.error(e.response?.data)
-    return res.send(`${e.code} error from discord`)
-  }
-})
+});
+//Define some Global Collections
+client.commands = new Discord.Collection();
+client.cooldowns = new Discord.Collection();
+client.slashCommands = new Discord.Collection();
+client.aliases = new Discord.Collection();
+client.categories = require("fs").readdirSync(`./commands`);
+//Require the Handlers                  Add the antiCrash file too, if its enabled
+["events", "commands", "slashCommands", settings.antiCrash ? "antiCrash" : null]
+    .filter(Boolean)
+    .forEach(h => {
+        require(`./handlers/${h}`)(client);
+    })
+//Start the Bot
+client.login(config.token)
 
-
-app.get('/', async (req,res) =>{
-  return res.send('Follow documentation ')
-})
-
-
-app.listen(8999, () => {
-
-})
-
+/**
+ * @INFO
+ * Bot Coded by Tomato#6966 | https://discord.gg/milrato
+ * @INFO
+ * Work for Milrato Development | https://milrato.eu
+ * @INFO
+ * Please mention Him / Milrato Development, when using this Code!
+ * @INFO
+ */

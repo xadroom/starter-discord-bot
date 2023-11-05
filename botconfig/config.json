@@ -1,0 +1,17 @@
+{
+  "token": "MTE3MDQxNDQ3MTcwNjA1MDU4MQ.GSAMbW.GK8uCXkv41FJetQ4XJlNE2VVmpSUAI_cL-1Hvg",
+  "prefix": "g!",
+  "loadSlashsGlobal": false, "_COMMENT_": "Establece esto a verdadero cuando tus comandos slash estén listos, falso carga instantáneamente pero verdadero carga lento pero estable. (COMANDOS GLOBALES/DE GREMIO, ¡DOCUMENTOS DE DISCORD!)",
+  "slashCommandsDirs": [
+        {
+                "Folder": "Info",
+                "CmdName": "info",
+                "CmdDescription": "Obtén información específica sobre algo!"
+        },
+        {
+                "Folder": "Admin",
+                "CmdName": "admin",
+                "CmdDescription": "Administra el servidor!"
+        }
+   ]
+}
