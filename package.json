@@ -1,18 +1,17 @@
 {
   "name": "v13musicbot",
   "version": "1.0.0",
-  "description": "A Discord Music Bot built with latest Discord Voice Features",
+  "description": "Un bot de música para Discord construido con las últimas características de voz de Discord",
   "main": "index.js",
-  
   "scripts": {
-   "start": "npm install"
-}
+    "start": "node index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/xadroom/starter-discord-bot/"
   },
   "keywords": [
-    "Music",
+    "Música",
     "Bot",
     "Discord",
     "Discord-jsv13",
@@ -23,5 +22,9 @@
   "author": "Enigmatic",
   "license": "MIT",
   "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "colors": "^1.4.0",
+    "discord.js": "^13.1.0",
+    "moment": "^2.29.1"
   }
 }
